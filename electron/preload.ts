@@ -1,6 +1,12 @@
-import { contextBridge, ipcRenderer } from "electron";
+//import { contextBridge, ipcRenderer } from "electron";
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("ipcRenderer", {
-  send: (channel: string, data: any) => ipcRenderer.send(channel, data),
+console.log("PRELOAD");
+contextBridge.exposeInMainWorld("electronAPI", {
+  open: (route: string) => ipcRenderer.invoke("open-file", route),
   // we can also expose variables, not just functions
 });
+
+// contextBridge.exposeInMainWorld("electronAPI", {
+//   openFile: () => ipcRenderer.invoke("openFile"),
+// });

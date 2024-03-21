@@ -1,7 +1,7 @@
 <template>
-  <div class="h-screen text-white">
+  <div class="h-4/5 text-white">
     <div class="h-screen flex flex-row">
-      <div class="flex flex-col w-1/12 mt-10">
+      <div class="flex flex-col w-36 mt-10">
         <p>{{ dir }}</p>
         <!--     <h1 v-if="isLoaded">Carpeta: {{ dirs[0].folder }}</h1>
         
@@ -22,7 +22,7 @@
         </button>
       </div>
 
-      <div class="card w-9/12 mt-5 h-fit">
+      <div class="card w-8/12 mt-5 h-fit">
         <RouteNav
           :route-array="routeArray"
           @new-route="(route) => changePath(route)"
@@ -34,7 +34,34 @@
           @set-route="(route) => changePath(route)"
           @go-back="goToPreviousPath()"
           @go-previous-dir="goToPreviousDir()"
+          @preview-img="(route) => previewImg(route)"
+          @preview-video="(route) => previewVideo(route)"
+          @no-preview="noPreview()"
         ></FileTable>
+      </div>
+      <div
+        :class="[
+          'w-3/12 fixed right-0 flex justify-center',
+          fullscreen ? 'fullscreen' : '',
+        ]"
+      >
+        <img
+          :src="imgPreview"
+          alt=""
+          v-if="showImg"
+          class="w-fit object-contain"
+        />
+        <video
+          :width="videoWidth"
+          :height="videoHeight"
+          :controls="fullscreen"
+          autoplay
+          loop
+          :muted="isMuted"
+          :src="videoPreview"
+          v-if="showVideo"
+          class="w-fit object-contain"
+        ></video>
       </div>
     </div>
   </div>
@@ -58,6 +85,8 @@
   const routeHistory = ref([] as Array<string>);
 
   let dirs: any = reactive([]);
+
+  //NAVIGATION
 
   function generateRouteArray() {
     let array = [] as Array<RouteNavigation>;
@@ -132,6 +161,61 @@
     // }
   }
 
+  //PREVIEW
+
+  const showImg = ref(false);
+  const imgPreview = ref("");
+  const showVideo = ref(false);
+  const videoPreview = ref("");
+  const videoWidth = ref(320);
+  const videoHeight = ref(200);
+  const fullscreen = ref(false);
+  const isMuted = ref(true);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key == "f" && (showVideo.value || showImg.value)) {
+      console.log("FFFF");
+      fullscreen.value = !fullscreen.value;
+      handleFullScreen();
+    }
+    if (event.key == "m" && showVideo.value) {
+      isMuted.value = !isMuted.value;
+    }
+  });
+
+  function handleFullScreen() {
+    if (!fullscreen.value) {
+      videoWidth.value = 320;
+      videoHeight.value = 200;
+    } else {
+      videoWidth.value = 1920;
+      videoHeight.value = 1080;
+    }
+    console.log(videoWidth.value, "x", videoHeight.value);
+  }
+
+  function previewImg(route: string) {
+    showVideo.value = false;
+    console.log("PREVIEW IMG:", route);
+    showImg.value = true;
+    imgPreview.value = route;
+  }
+
+  function previewVideo(route: string) {
+    showImg.value = false;
+    console.log("PREVIEW VIDEO:", route);
+    showVideo.value = true;
+    videoPreview.value = route;
+    console.log(videoPreview.value);
+  }
+
+  function noPreview() {
+    showImg.value = false;
+    showVideo.value = false;
+    videoPreview.value = "";
+    imgPreview.value = "";
+  }
+
   async function fetchData() {
     isLoaded.value = false;
     generateRouteArray();
@@ -158,4 +242,10 @@
   });
 </script>
 
-<style scoped></style>
+<style scoped>
+  .fullscreen {
+    height: 100vh;
+    width: 100vw;
+    object-fit: fill;
+  }
+</style>

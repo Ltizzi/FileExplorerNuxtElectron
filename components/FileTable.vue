@@ -1,9 +1,9 @@
 <template>
   <div
-    class="overflow-x-auto overflow-y-scroll h-fit rounded-lg border-0 border-gray-200 dark:border-violet-950"
+    class="overflow-x-auto rounded-lg border-0 border-gray-200 dark:border-violet-950"
   >
     <table
-      class="min-w-full border text-lg text-yellow-200 border-purple-600 bg-white dark:border-violet-950 dark:bg-indigo-950"
+      class="min-w-full overflow-y-auto border text-lg text-yellow-200 border-purple-600 bg-white dark:border-violet-950 dark:bg-indigo-950"
     >
       <thead
         class="ltr:text-left rtl:text-right border border-purple-600 dark:bg-gradient-to-br dark:from-indigo-950 dark:to-pink-950 dark:via-violet-950 dark:from-30% dark:via-90%"
@@ -94,7 +94,7 @@
           @dblclick="
             file.isFolder ? $emit('setRoute', file.route) : openFile(file.route)
           "
-          @mouseover="state.selectedFile = index"
+          @click.left="state.selectedFile = index"
         >
           <td
             class="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white flex flex-row gap-5"
@@ -125,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-  // import { ipcRenderer } from "electron";
+  // import { ipcRenderer, shell } from 'electron';
   import type { HDElement } from "~/types/common";
 
   const props = defineProps({
@@ -136,9 +136,18 @@
 
   const state = reactive({
     selectedFile: 0,
+    canOpen: true,
+    preview: "",
   });
 
-  const emit = defineEmits(["setRoute", "goBack", "goPreviousDir"]);
+  const emit = defineEmits([
+    "setRoute",
+    "goBack",
+    "goPreviousDir",
+    "previewImg",
+    "previewVideo",
+    "noPreview",
+  ]);
 
   document.addEventListener("keydown", (event) => {
     let maxIndex = 0;
@@ -148,12 +157,20 @@
     if (props.drives && props.showDrives) {
       maxIndex = props.drives.length - 1;
     }
+    if (state.selectedFile === -1) {
+      state.canOpen = false;
+    } else state.canOpen = true;
+
     if (event.key === "ArrowDown" && state.selectedFile != maxIndex) {
       state.selectedFile += 1;
+      handlePreview();
     }
     if (event.key === "ArrowUp") {
-      if (!props.showDrives && state.selectedFile != -1)
+      if (!props.showDrives && state.selectedFile != -1) {
         state.selectedFile -= 1;
+        handlePreview();
+      }
+
       if (props.showDrives && state.selectedFile != 0) state.selectedFile -= 1;
     }
     if (
@@ -172,13 +189,15 @@
     if (event.key === "Enter" && state.selectedFile == -1) {
       emit("goPreviousDir");
       state.selectedFile = 0;
+      state.canOpen = false;
     }
     if (
       event.key == "Enter" &&
       props.files &&
       state.selectedFile != -1 &&
       !props.files[state.selectedFile].isFolder &&
-      !props.showDrives
+      !props.showDrives &&
+      state.canOpen
     ) {
       openFile(props.files[state.selectedFile].route);
     }
@@ -190,14 +209,34 @@
     }
   });
 
-  // document.addEventListener("keydown", (event) => {});
+  const extensions = {
+    img: ["jpg", "jpeg", "gif", "png", "jfif"],
+    video: ["mkv", "avi", "mp4"],
+  };
 
-  function openFile(route: string) {
-    console.log("DOBLE CLICK");
+  function handlePreview() {
+    const route = props.files[state.selectedFile].route;
+    console.log("ruta from handlepreview: ", route);
+    if (!route || props.showDrives) {
+      state.canOpen = false;
+      return;
+    } else {
+      let extension = getExtension(route);
+      if (extensions.img.includes(extension)) {
+        emit("previewImg", route);
+      } else if (extensions.video.includes(extension)) {
+        emit("previewVideo", route);
+      } else {
+        emit("noPreview");
+      }
+    }
+  }
 
-    const { ipcRenderer } = window.require("electron");
-    // $fetch("/api/openfile?route=" + route, { method: "GET" });
-    ipcRenderer.send("openfile", route);
+  async function openFile(route: string) {
+    console.log("ruta: ", route);
+    console.log(window);
+    await commAPI.openFile(route);
+    state.canOpen = false;
   }
 
   function getExtension(name: string) {

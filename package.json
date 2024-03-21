@@ -1,7 +1,6 @@
 {
   "name": "file-explorer",
   "private": true,
-  "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
     "build": "nuxt build --prerender && electron-builder",

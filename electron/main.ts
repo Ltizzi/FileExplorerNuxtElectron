@@ -1,32 +1,21 @@
 import { app, BrowserWindow, shell, ipcMain } from "electron";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const path = require("node:path");
 
 const createWindows = () => {
   const win = new BrowserWindow({
+    width: 1920,
+    height: 1080,
     webPreferences: {
-      preload: path.join(__dirname, "preoload.ts"),
+      preload: path.join(__dirname, "preload.js"),
+      contextIsolation: false,
       nodeIntegration: true,
+      webSecurity: false,
     },
   });
   win.loadURL("http://localhost:3000");
 };
 
-async function openFile(route: string) {
-  await shell
-    .openPath(route)
-    .then(() => console.log("Archivo abierto exitosamente"))
-    .catch((error) => console.error("Error al abrir el archivo:", error));
-}
-
 app.whenReady().then(() => {
+  console.log(".....****.....");
   createWindows();
-  ipcMain.on("openfile", (event, route) => {
-    console.log("ASDASD");
-    openFile(route);
-  });
 });

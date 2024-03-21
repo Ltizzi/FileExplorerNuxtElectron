@@ -1,13 +1,16 @@
 <template>
-  <NuxtLayout>
-    <NuxtPage></NuxtPage>
-  </NuxtLayout>
+  <div class="">
+    <NuxtLayout>
+      <NuxtPage></NuxtPage>
+    </NuxtLayout>
+  </div>
 </template>
 <script setup lang="ts">
   console.log("START...");
 </script>
 <style>
   body {
+    height: 100vh;
     background-image: linear-gradient(
       to bottom right,
       var(--tw-gradient-stops)
