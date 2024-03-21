@@ -147,6 +147,7 @@
     "goPreviousDir",
     "previewImg",
     "previewVideo",
+    "previewAudio",
     "noPreview",
   ]);
 
@@ -238,8 +239,9 @@
   });
 
   const extensions = {
-    img: ["jpg", "jpeg", "gif", "png", "jfif", "webp"],
-    video: ["mkv", "avi", "mp4", "mpg", "flv"],
+    img: ["jpg", "jpeg", "gif", "png", "jfif", "webp", "bmp"],
+    video: ["mkv", "avi", "mp4", "mpg", "flv", "webm"],
+    audio: ["wav", "mp3", "ogg", "flac"],
   };
 
   function handlePreview() {
@@ -249,11 +251,13 @@
       state.canOpen = false;
       return;
     } else {
-      let extension = getExtension(route);
+      let extension = getExtension(route).toLowerCase();
       if (extensions.img.includes(extension)) {
         emit("previewImg", route);
       } else if (extensions.video.includes(extension)) {
         emit("previewVideo", route);
+      } else if (extensions.audio.includes(extension)) {
+        emit("previewAudio", route);
       } else {
         emit("noPreview");
       }

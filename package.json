@@ -12,7 +12,8 @@
   "dependencies": {
     "nuxt": "^3.10.3",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "wavesurfer.js": "^7.7.5"
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.11.4",

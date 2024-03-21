@@ -36,6 +36,7 @@
           @go-previous-dir="goToPreviousDir()"
           @preview-img="(route) => previewImg(route)"
           @preview-video="(route) => previewVideo(route)"
+          @preview-audio="(route) => previewAudio(route)"
           @no-preview="noPreview()"
         ></FileTable>
       </div>
@@ -62,6 +63,10 @@
           v-if="showVideo"
           class="w-fit object-contain"
         ></video>
+        <div
+          :class="['w-full object-contain', showAudio ? '' : 'hidden']"
+          id="wavesurfer"
+        ></div>
       </div>
     </div>
   </div>
@@ -69,6 +74,7 @@
 
 <script setup lang="ts">
   import type { RouteNavigation } from "~/types/common";
+  import WaveSurfer from "wavesurfer.js";
 
   const dir = ref("C:\\");
   const actualFolder = ref("");
@@ -164,11 +170,17 @@
   const showImg = ref(false);
   const imgPreview = ref("");
   const showVideo = ref(false);
+
   const videoPreview = ref("");
   const videoWidth = ref(320);
   const videoHeight = ref(200);
+
   const fullscreen = ref(false);
   const isMuted = ref(true);
+
+  const showAudio = ref(false);
+  // const audioPreview = ref("");
+  let wavesurfer!: any;
 
   document.addEventListener("keydown", (event) => {
     if (event.key == "f" && (showVideo.value || showImg.value)) {
@@ -194,6 +206,7 @@
 
   function previewImg(route: string) {
     showVideo.value = false;
+    showAudio.value = false;
     console.log("PREVIEW IMG:", route);
     showImg.value = true;
     imgPreview.value = route;
@@ -201,15 +214,28 @@
 
   function previewVideo(route: string) {
     showImg.value = false;
+    showAudio.value = false;
     console.log("PREVIEW VIDEO:", route);
     showVideo.value = true;
     videoPreview.value = route;
     console.log(videoPreview.value);
   }
 
+  async function previewAudio(route: string) {
+    showImg.value = false;
+    showVideo.value = false;
+    console.log("PREVIEW AUDIO: ", route);
+    showAudio.value = true;
+    await wavesurfer.load(route);
+    await wavesurfer.play();
+  }
+
   function noPreview() {
     showImg.value = false;
     showVideo.value = false;
+    showAudio.value = false;
+    wavesurfer.stop();
+    wavesurfer.empty();
     videoPreview.value = "";
     imgPreview.value = "";
   }
@@ -237,6 +263,14 @@
   onMounted(async () => {
     await fetchData();
     await fetchDrives();
+    wavesurfer = WaveSurfer.create({
+      container: "#wavesurfer",
+      waveColor: "#db2777",
+      progressColor: "#4f46e5",
+      height: 200,
+      autoCenter: true,
+      //url: route,
+    });
   });
 </script>
 
