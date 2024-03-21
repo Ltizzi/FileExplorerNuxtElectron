@@ -104,7 +104,7 @@
 
   async function changePath(route: string) {
     if (showDrives.value) showDrives.value = false;
-    console.log("ROUTE: ", route);
+    // console.log("ROUTE: ", route);
     if (route && route.length == 2 && route[1] == ":") {
       route = route + "\\";
     }
@@ -114,14 +114,12 @@
     ) {
       routeHistory.value.push(dir.value);
     }
-    console.log("ROUTE HISTORY:");
-    console.log(routeHistory.value);
+    // console.log("ROUTE HISTORY:");
+    // console.log(routeHistory.value);
     previousPath.value = dir.value;
     dir.value = route;
-
     await fetchData();
     generateRouteArray();
-
     isLoaded.value = true;
   }
 
@@ -246,6 +244,6 @@
   .fullscreen {
     height: 100vh;
     width: 100vw;
-    object-fit: fill;
+    object-fit: cover;
   }
 </style>

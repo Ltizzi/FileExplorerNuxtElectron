@@ -89,7 +89,7 @@
           :key="index"
           :class="[
             ' hover:cursor-pointer',
-            index == state.selectedFile ? 'selected' : '',
+            index == state.selectedFile ? 'selected scroll-smooth' : '',
           ]"
           @dblclick="
             file.isFolder ? $emit('setRoute', file.route) : openFile(file.route)
@@ -138,6 +138,7 @@
     selectedFile: 0,
     canOpen: true,
     preview: "",
+    previousIndex: [0],
   });
 
   const emit = defineEmits([
@@ -165,6 +166,11 @@
       state.selectedFile += 1;
       handlePreview();
     }
+    if (event.key === "PageDown" && state.selectedFile != maxIndex) {
+      if (maxIndex - state.selectedFile < 20) state.selectedFile = maxIndex;
+      else state.selectedFile += 20;
+      handlePreview();
+    }
     if (event.key === "ArrowUp") {
       if (!props.showDrives && state.selectedFile != -1) {
         state.selectedFile -= 1;
@@ -173,22 +179,42 @@
 
       if (props.showDrives && state.selectedFile != 0) state.selectedFile -= 1;
     }
+    if (event.key === "PageUp") {
+      if (state.selectedFile < 20 && !props.showDrives) state.selectedFile = -1;
+      if (state.selectedFile >= 20 && !props.showDrives) {
+        state.selectedFile -= 20;
+        handlePreview();
+      }
+      if (props.showDrives && props.drives.length < 20) {
+        state.selectedFile = 0;
+      }
+    }
+    if (event.key === "Home") {
+      if (!props.showDrives) state.selectedFile = -1;
+      else state.selectedFile = 0;
+    }
+    if (event.key === "End") {
+      if (!props.showDrives) state.selectedFile = props.files.length - 1;
+      else state.selectedFile = props.drives.length - 1;
+    }
     if (
       event.key === "Enter" &&
       state.selectedFile >= 0 &&
       props.files &&
       props.files[state.selectedFile].isFolder &&
-      !props.showDrives
+      !props.showDrives &&
+      state.selectedFile >= 0
     ) {
-      if (state.selectedFile >= 0)
-        emit("setRoute", props.files[state.selectedFile].route);
+      state.previousIndex.push(state.selectedFile);
+      emit("setRoute", props.files[state.selectedFile].route);
       setTimeout(() => {
-        state.selectedFile = 0;
+        state.selectedFile = -1;
       }, 100);
     }
     if (event.key === "Enter" && state.selectedFile == -1) {
       emit("goPreviousDir");
-      state.selectedFile = 0;
+      state.selectedFile = state.previousIndex[state.previousIndex.length - 1];
+      state.previousIndex.pop();
       state.canOpen = false;
     }
     if (
@@ -202,7 +228,9 @@
       openFile(props.files[state.selectedFile].route);
     }
     if (event.key === "Enter" && props.showDrives && props.drives) {
+      state.previousIndex.push(state.selectedFile);
       emit("setRoute", props.drives[state.selectedFile]);
+      state.selectedFile = -1;
     }
     if (event.key === "Backspace") {
       emit("goBack");
@@ -210,8 +238,8 @@
   });
 
   const extensions = {
-    img: ["jpg", "jpeg", "gif", "png", "jfif"],
-    video: ["mkv", "avi", "mp4"],
+    img: ["jpg", "jpeg", "gif", "png", "jfif", "webp"],
+    video: ["mkv", "avi", "mp4", "mpg", "flv"],
   };
 
   function handlePreview() {
@@ -244,10 +272,11 @@
     return splittedString[splittedString.length - 1];
   }
 
-  // onMounted(() => {
-  //   if (props.showDrives) showDrives.value = true;
-  //   else showDrives.value = false;
-  // });
+  onMounted(() => {
+    if (props.showDrives) state.selectedFile = 0;
+    else if (!props.files && props.showDrives) state.selectedFile = -1;
+    else state.selectedFile = -1;
+  });
 </script>
 <style>
   .selected {
