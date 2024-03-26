@@ -3,7 +3,7 @@
     class="overflow-x-auto rounded-lg border-0 border-gray-200 dark:border-violet-950"
   >
     <table
-      class="min-w-full overflow-y-auto border text-lg text-yellow-200 border-purple-600 bg-white dark:border-violet-950 dark:bg-indigo-950"
+      class="min-w-full overflow-y-auto border text-lg text-yellow-200 border-purple-600 bg-white dark:border-violet-950 dark:bg-indigo-950 font-mono"
     >
       <thead
         class="ltr:text-left rtl:text-right border border-purple-600 dark:bg-gradient-to-br dark:from-indigo-950 dark:to-pink-950 dark:via-violet-950 dark:from-30% dark:via-90%"
@@ -33,7 +33,7 @@
       </thead>
 
       <tbody
-        class="divide-y divide-violet-600 dark:divide-violet-600 dark:bg-gradient-to-r dark:from-indigo-950 dark:to-purple-950 dark:via-90% dark:via-violet-950 text-yellow-50 border border-purple-600"
+        class="divide-y divide-violet-600 dark:divide-violet-600 dark:bg-gradient-to-r dark:from-indigo-950 dark:to-purple-950 dark:via-90% dark:via-violet-950 border-purple-600 text-yellow-50 border"
       >
         <!--    @click=" file.folder)"$emit('setRoute', file.isFolder ? file.route : openFile(file.route)) -->
         <tr
