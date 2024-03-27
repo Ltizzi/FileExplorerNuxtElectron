@@ -103,7 +103,7 @@
             class="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white flex flex-row gap-5"
           >
             <span v-if="file.isFolder"><IconsFolderIcon /></span>
-            <p>{{ fileNameTemplateGenerator(file.name) }}</p>
+            <p>{{ fileNameTemplateGenerator(file) }}</p>
           </td>
           <td
             class="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200"
@@ -287,17 +287,21 @@
         sol = sol / 1024;
         if (sol > 1024) {
           sol = sol / 1024;
-          return sol.toFixed(2) + " GB";
-        } else return sol.toFixed(2) + " MB";
-      } else return sol.toFixed(2) + " kb";
-    } else return space + " bytes";
+          return sol.toFixed(2) + " Gb";
+        } else return sol.toFixed(2) + " Mb";
+      } else return sol.toFixed(2) + " Kb";
+    } else return space + " B";
   }
 
-  function fileNameTemplateGenerator(name: string) {
-    if (name.length > 65) {
-      return name.substring(0, 65) + "(...)";
+  function fileNameTemplateGenerator(file: any) {
+    if (file.name.length > 65) {
+      return (
+        file.name.substring(0, 65) +
+        "(...)" +
+        `${!file.isFolder ? "." + getExtension(file.name) : ""}`
+      );
     }
-    return name;
+    return file.name;
   }
 
   onMounted(() => {
