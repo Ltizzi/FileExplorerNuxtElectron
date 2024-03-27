@@ -278,6 +278,6 @@
   .fullscreen {
     height: 100vh;
     width: 100vw;
-    object-fit: cover;
+    object-fit: fill;
   }
 </style>

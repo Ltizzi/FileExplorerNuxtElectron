@@ -73,7 +73,7 @@
         <tr
           v-if="!props.showDrives"
           :class="[
-            ' hover:cursor-pointer',
+            ' hover:cursor-pointer w-full',
             state.selectedFile == -1 ? 'selected' : '',
           ]"
         >
@@ -82,6 +82,9 @@
           >
             ...
           </td>
+          <td class="full"></td>
+          <td class="full"></td>
+          <td class="full"></td>
         </tr>
         <tr
           v-if="!props.showDrives"
@@ -100,7 +103,7 @@
             class="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white flex flex-row gap-5"
           >
             <span v-if="file.isFolder"><IconsFolderIcon /></span>
-            <p>{{ file.name }}</p>
+            <p>{{ fileNameTemplateGenerator(file.name) }}</p>
           </td>
           <td
             class="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200"
@@ -110,7 +113,7 @@
           <td
             class="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200"
           >
-            {{ file.size }} bytes
+            {{ fileSpaceTemplateGenerator(file.size) }}
           </td>
 
           <td
@@ -274,6 +277,27 @@
   function getExtension(name: string) {
     let splittedString = name.split(".");
     return splittedString[splittedString.length - 1];
+  }
+
+  function fileSpaceTemplateGenerator(space: number) {
+    let sol = 0;
+    if (space > 1024) {
+      sol = space / 1024;
+      if (sol > 1024) {
+        sol = sol / 1024;
+        if (sol > 1024) {
+          sol = sol / 1024;
+          return sol.toFixed(2) + " GB";
+        } else return sol.toFixed(2) + " MB";
+      } else return sol.toFixed(2) + " kb";
+    } else return space + " bytes";
+  }
+
+  function fileNameTemplateGenerator(name: string) {
+    if (name.length > 65) {
+      return name.substring(0, 65) + "(...)";
+    }
+    return name;
   }
 
   onMounted(() => {
