@@ -50,7 +50,7 @@
           :src="imgPreview"
           alt=""
           v-if="showImg"
-          class="w-fit object-contain"
+          class="w-fit object-contain pixel"
         />
         <video
           :width="videoWidth"
@@ -279,5 +279,14 @@
     height: 100vh;
     width: 100vw;
     object-fit: fill;
+  }
+
+  .pixel {
+    image-rendering: auto;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+
+    /* Safari seems to support, but seems deprecated and does the same thing as the others. */
+    /*image-rendering: -webkit-optimize-contrast;*/
   }
 </style>
